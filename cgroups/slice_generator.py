@@ -51,7 +51,8 @@ def create_slice_file(slice_name: str, parent_slice: str = None, properties: dic
 def main():
     parser = argparse.ArgumentParser(description="Generate systemd slices for domain isolation")
     parser.add_argument("--domain-report", default="/tmp/domain_discovery_report.json", help="Path to domain discovery JSON")
-    parser.add_argument("--profiles", default="/Users/rsmmonaem/.gemini/antigravity/scratch/domain-isolation-platform/cgroups/package_profiles.json", help="Path to package profiles JSON")
+    default_profiles = os.path.join(os.path.dirname(os.path.abspath(__file__)), "package_profiles.json")
+    parser.add_argument("--profiles", default=default_profiles, help="Path to package profiles JSON")
     parser.add_argument("--dry-run", action="store_true", help="Print slice unit configurations without writing to /etc/systemd/system")
     args = parser.parse_args()
 
