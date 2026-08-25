@@ -38,10 +38,11 @@ def create_slice_file(slice_name: str, parent_slice: str = None, properties: dic
             
     content_str = "\n".join(content) + "\n"
     
-    print(f"[+] Slice Config for {filename}:")
-    print("--------------------------------------------------")
-    print(content_str)
-    print("--------------------------------------------------")
+    if dry_run:
+        print(f"[+] Slice Config for {filename}:")
+        print("--------------------------------------------------")
+        print(content_str)
+        print("--------------------------------------------------")
     
     if not dry_run:
         SYSTEMD_DIR.mkdir(parents=True, exist_ok=True)
