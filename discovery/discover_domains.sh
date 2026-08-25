@@ -58,10 +58,10 @@ for domain in $DOMAINS_LIST; do
     fi
 
     # Detect running queue workers for user
-    QUEUE_WORKERS=$(ps aux | grep -v grep | grep "$LINUX_USER" | grep "queue:work\|horizon" | wc -l || echo "0")
+    QUEUE_WORKERS=$(ps aux | grep -v grep | grep "$LINUX_USER" | grep -c "queue:work\|horizon" || true)
 
     # Detect active cron jobs for user
-    CRON_COUNT=$(crontab -u "$LINUX_USER" -l 2>/dev/null | grep -v '^#' | grep -v '^$' | wc -l || echo "0")
+    CRON_COUNT=$(crontab -u "$LINUX_USER" -l 2>/dev/null | grep -v '^#' | grep -c -v '^$' || true)
 
     # Construct JSON snippet
     DOMAIN_ENTRY=$(cat <<EOF
