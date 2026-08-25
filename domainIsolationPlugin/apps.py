@@ -1,12 +1,16 @@
 from django.apps import AppConfig
+from django.core.signals import request_started
 import logging
-import threading
 
 class DomainIsolationConfig(AppConfig):
     name = 'domainIsolationPlugin'
     verbose_name = "Domain Isolation Native Unlocker"
+    patched = False
 
-    def apply_patch(self):
+    def apply_patch(self, sender, **kwargs):
+        if self.patched:
+            return
+            
         try:
             from packages.packagesManager import PackagesManager
             
@@ -18,10 +22,11 @@ class DomainIsolationConfig(AppConfig):
                 return True
                 
             PackagesManager.checkAddonAccess = bypass_addon_access
+            self.patched = True
             logging.info("[Domain Isolation Plugin] Successfully bypassed CyberPanel Addon check for Resource Limits!")
         except Exception as e:
             logging.error(f"[Domain Isolation Plugin] Failed to apply native patch: {str(e)}")
 
     def ready(self):
-        # Defer the import by 2 seconds to avoid Django's "populate() isn't reentrant" error
-        threading.Timer(2.0, self.apply_patch).start()
+        # Apply the patch safely on the first HTTP request to avoid populate() errors
+        request_started.connect(self.apply_patch)
