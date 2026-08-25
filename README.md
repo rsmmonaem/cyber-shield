@@ -1,48 +1,47 @@
-# Per-Domain Resource Isolation & Request Protection Platform
+# Cyber-Shield (Per-Domain Resource Isolation & Protection Platform)
 
 A Production-Grade Multi-Tenant Isolation, Request Protection, and SRE Observability Platform for **AlmaLinux 9**, **CyberPanel**, **OpenLiteSpeed (OLS)**, **LSAPI / lsphp**, **Laravel**, **Redis**, **MariaDB/PostgreSQL**, and **Docker**.
+
+---
+
+## 🚀 One-Click Installation
+
+To install **Cyber-Shield** on any AlmaLinux 9 CyberPanel server, run the following command as `root`:
+
+```bash
+curl -sL https://raw.githubusercontent.com/rsmmonaem/cyber-shield/main/install.sh | bash
+```
+
+The installer will automatically:
+1. Create pre-flight safety backups of OpenLiteSpeed and CyberPanel configurations.
+2. Generate Linux `cgroup v2` memory, CPU, IO, and PID isolation boundaries per domain.
+3. Apply OpenLiteSpeed request protection and Cloudflare Real-IP rules.
+4. Launch the `domain-guardian` automated policy engine.
+5. Launch the live **SRE Admin Dashboard** on port `8088`.
 
 ---
 
 ## Directory Structure
 
 ```
-domain-isolation-platform/
-├── discovery/           # Phase 1 & 2: System Audit & Full Domain Mapping
-│   ├── discover_system.sh
-│   └── discover_domains.sh
-├── cgroups/             # Phase 3-9: systemd Slices & cgroup v2 Engine
-│   ├── package_profiles.json
-│   ├── slice_generator.py
-│   └── domain_cgroup_manager.py
-├── ols_protection/      # Phase 10-12: Request Rate-Limiting & Cloudflare Real-IP Protection
-│   └── ols_rule_generator.py
-├── socket_monitor/      # Phase 13: CLOSE-WAIT & Connection Accumulation Engine
-│   └── closewait_detector.py
-├── daemon/              # Phase 14-20: Queue Worker Isolation & Automatic Policy Engine
-│   ├── queue_isolation.sh
-│   ├── db_redis_monitor.py
-│   └── domain_guardian.py
-├── dashboard/           # Phase 21-23: Time-Series Metrics & SRE Web Dashboard
-│   ├── app.py
-│   ├── alert_engine.py
-│   └── static/index.html
-├── metrics/             # Phase 23: Time-Series Database Collector
-│   └── metrics_collector.py
-├── safety/              # Phase 24-25: Backups, Rollback & 4-Stage Deployment Runner
-│   ├── backup_manager.sh
-│   ├── rollback.sh
-│   └── deploy_platform.sh
-├── tests/               # Phase 26-27: Failure Testing Suite & Incident Analyzer
-│   ├── failure_injector.sh
-│   └── incident_analyzer.sh
+cyber-shield/
+├── discovery/           # System Audit & Domain Ownership Inventory
+├── cgroups/             # cgroup v2 & systemd Slices Engine
+├── ols_protection/      # OpenLiteSpeed Request Rate-Limiting & Cloudflare Settings
+├── socket_monitor/      # TCP CLOSE-WAIT Forensic Connection Engine
+├── daemon/              # Queue Worker Isolation & Degradation Policy Engine
+├── dashboard/           # Live SRE Web Dashboard
+├── metrics/             # SQLite Time-Series Metric Collector
+├── safety/              # Backups, Rollback & Deployment Runner
+├── tests/               # Failure Testing Suite & Incident Analyzer
 └── docs/                # Architecture Specs & Documentation
-    └── ARCHITECTURE.md
 ```
 
 ---
 
-## Quick Start & Operator Workflows
+## Manual Execution & Workflows
+
+If you have cloned the repository manually, you can run the following operations:
 
 ### 1. Run Pre-flight Discovery
 ```bash
@@ -55,18 +54,26 @@ domain-isolation-platform/
 ./safety/deploy_platform.sh observe
 ```
 
-### 3. Launch Live SRE Admin Dashboard
-```bash
-python3 dashboard/app.py
-```
-Open browser at `http://<SERVER-IP>:8088`.
-
-### 4. Execute Containment Acceptance Test
+### 3. Execute Containment Acceptance Test (Failure Injection)
 ```bash
 ./tests/failure_injector.sh testdomain.com cpu 15
 ```
 
-### 5. Emergency Rollback
+### 4. Emergency Rollback
+If you ever need to restore your server's exact original configuration, run:
 ```bash
 ./safety/rollback.sh
 ```
+
+---
+
+## Accessing the Dashboard
+
+After installation, open your web browser and navigate to:
+`http://<YOUR-SERVER-IP>:8088`
+
+You will see real-time tracking of:
+* Domain CPU, RAM, and Disk IO usage
+* Active connections, FDs, and CLOSE-WAIT sockets
+* Active PHP workers and live request rates
+* System status warnings and cgroup throttles
