@@ -51,9 +51,24 @@ def query_db(query: str) -> list:
     return results
 
 def get_all_packages() -> dict:
-    """Returns a dictionary of {package_id: package_name}"""
-    rows = query_db("SELECT id, packageName FROM packages_package")
-    return {row["id"]: row["packageName"] for row in rows}
+    """Returns a dictionary of package configurations from CyberPanel"""
+    # Fetch native limits as well
+    query = "SELECT id, packageName, memoryLimitMB, cpuCores, ioLimitMBPS, procHardLimit FROM packages_package"
+    rows = query_db(query)
+    packages = {}
+    for row in rows:
+        pkg_name = row.get("packageName")
+        if not pkg_name:
+            continue
+            
+        packages[pkg_name.lower()] = {
+            "memory_high": f"{row.get('memoryLimitMB', '1024')}M",
+            "memory_max": f"{int(row.get('memoryLimitMB', '1024')) + 256}M",
+            "cpu_weight": int(row.get("cpuCores", "1")) * 100,
+            "tasks_max": int(row.get("procHardLimit", "500")),
+            "io_limit_mbps": int(row.get("ioLimitMBPS", "10"))
+        }
+    return packages
 
 def get_domain_package_mapping() -> dict:
     """Returns a dictionary mapping domain name to package name"""

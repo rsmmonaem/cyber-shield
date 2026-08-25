@@ -64,13 +64,12 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="Print slice unit configurations without writing to /etc/systemd/system")
     args = parser.parse_args()
 
-    # Load package profiles
-    if os.path.exists(args.profiles):
-        with open(args.profiles, 'r') as f:
-            profiles = json.load(f).get("packages", {})
+    # 0. Load package profiles directly from CyberPanel MariaDB
+    profiles = {}
+    if cyberpanel_db:
+        profiles = cyberpanel_db.get_all_packages()
     else:
-        print(f"[!] Warning: Profiles file {args.profiles} not found. Using defaults.")
-        profiles = {}
+        print("[!] Warning: Could not connect to CyberPanel DB.")
 
     # 1. Base hosting slice
     create_slice_file("hosting", parent_slice=None, properties={
@@ -84,15 +83,6 @@ def main():
     domain_pkg_map = {}
     if cyberpanel_db:
         domain_pkg_map = cyberpanel_db.get_domain_package_mapping()
-        # Merge all active packages from CyberPanel into profiles
-        for pkg_name in set(domain_pkg_map.values()):
-            if pkg_name.lower() not in profiles:
-                profiles[pkg_name.lower()] = {
-                    "cpu_weight": 100,
-                    "tasks_max": 50,
-                    "memory_high": "1G",
-                    "memory_max": "1.2G"
-                }
 
     # 2. Package Slices
     for pkg_id, pkg_data in profiles.items():
@@ -100,8 +90,8 @@ def main():
         props = {
             "CPUWeight": pkg_data.get("cpu_weight", 100),
             "TasksMax": pkg_data.get("tasks_max", 50),
-            "MemoryHigh": pkg_data.get("memory_high", "1.8G"),
-            "MemoryMax": pkg_data.get("memory_max", "2G")
+            "MemoryHigh": pkg_data.get("memory_high", "1G"),
+            "MemoryMax": pkg_data.get("memory_max", "1.2G")
         }
         create_slice_file(slice_id, parent_slice="hosting", properties=props, dry_run=args.dry_run)
 
