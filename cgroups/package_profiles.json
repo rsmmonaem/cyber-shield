@@ -1,0 +1,61 @@
+{
+  "packages": {
+    "basic": {
+      "name": "Basic Profile",
+      "cpu_weight": 100,
+      "cpu_quota": "100%",
+      "memory_low": "256M",
+      "memory_high": "450M",
+      "memory_max": "512M",
+      "memory_swap_max": "256M",
+      "io_read_bps": "10M",
+      "io_write_bps": "10M",
+      "io_read_iops": 1000,
+      "io_write_iops": 1000,
+      "tasks_max": 20,
+      "nofile_limit": 5000,
+      "php_workers": 5,
+      "connections": 100,
+      "requests_per_sec": 20,
+      "inodes_limit": 100000
+    },
+    "business": {
+      "name": "Business Profile",
+      "cpu_weight": 200,
+      "cpu_quota": "200%",
+      "memory_low": "1G",
+      "memory_high": "1.8G",
+      "memory_max": "2G",
+      "memory_swap_max": "512M",
+      "io_read_bps": "30M",
+      "io_write_bps": "30M",
+      "io_read_iops": 3000,
+      "io_write_iops": 3000,
+      "tasks_max": 50,
+      "nofile_limit": 20000,
+      "php_workers": 15,
+      "connections": 500,
+      "requests_per_sec": 100,
+      "inodes_limit": 500000
+    },
+    "enterprise": {
+      "name": "Enterprise Profile",
+      "cpu_weight": 400,
+      "cpu_quota": "400%",
+      "memory_low": "3G",
+      "memory_high": "3.6G",
+      "memory_max": "4G",
+      "memory_swap_max": "1G",
+      "io_read_bps": "100M",
+      "io_write_bps": "100M",
+      "io_read_iops": 10000,
+      "io_write_iops": 10000,
+      "tasks_max": 100,
+      "nofile_limit": 50000,
+      "php_workers": 40,
+      "connections": 2000,
+      "requests_per_sec": 300,
+      "inodes_limit": 2000000
+    }
+  }
+}
