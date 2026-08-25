@@ -48,6 +48,8 @@ def check_inode_usage() -> list:
             parts = line.split()
             if len(parts) >= 6:
                 fs, inodes, used, free, use_pct, mount = parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]
+                if use_pct == '-':
+                    continue
                 pct_val = int(use_pct.replace("%", ""))
                 if pct_val >= 80:
                     warnings.append({
