@@ -70,6 +70,7 @@ echo -e "${GREEN}[+] Running Pre-Flight Backup and Discovery...${NC}"
 echo -e "${GREEN}[+] Applying Systemd Slices...${NC}"
 python3 cgroups/slice_generator.py --domain-report /tmp/domain_discovery_report.json
 systemctl daemon-reload
+systemctl start hosting.slice || true
 
 # 8. Configure OpenLiteSpeed
 echo -e "${GREEN}[+] Configuring OpenLiteSpeed Request Protection...${NC}"
