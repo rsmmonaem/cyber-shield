@@ -18,7 +18,7 @@ get_domain_user() {
     local domain="$1"
     local doc_root
     doc_root=$(grep -i "docRoot" "$VHOST_DIR/$domain/vhconf.conf" 2>/dev/null | head -n1 | awk '{print $2}' || echo "")
-    if [ -n "$doc_root" ]; return 0; fi
+    if [ -n "$doc_root" ]; then return 0; fi
     # Fallback to checking owner of /home/$domain
     if [ -d "/home/$domain" ]; then
         stat -c '%U' "/home/$domain" 2>/dev/null || echo "nobody"
