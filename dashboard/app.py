@@ -17,11 +17,6 @@ PORT = 8088
 STATIC_DIR = Path(__file__).parent / "static"
 
 class DashboardHandler(SimpleHTTPRequestHandler):
-    def translate_path(self, path):
-        if path == "/" or path == "/index.html":
-            return str(STATIC_DIR / "index.html")
-        return super().translate_path(path)
-
     def do_GET(self):
         if self.path == "/api/metrics":
             self.send_response(200)
