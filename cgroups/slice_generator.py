@@ -20,6 +20,13 @@ import json
 import argparse
 from pathlib import Path
 
+# Add discovery dir to path to import cyberpanel_db
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'discovery'))
+try:
+    import cyberpanel_db
+except ImportError:
+    cyberpanel_db = None
+
 SYSTEMD_DIR = Path("/etc/systemd/system")
 
 def create_slice_file(slice_name: str, parent_slice: str = None, properties: dict = None, dry_run: bool = False):
@@ -73,6 +80,20 @@ def main():
         "TasksAccounting": "yes"
     }, dry_run=args.dry_run)
 
+    # Fetch dynamic domain mapping from CyberPanel
+    domain_pkg_map = {}
+    if cyberpanel_db:
+        domain_pkg_map = cyberpanel_db.get_domain_package_mapping()
+        # Merge all active packages from CyberPanel into profiles
+        for pkg_name in set(domain_pkg_map.values()):
+            if pkg_name.lower() not in profiles:
+                profiles[pkg_name.lower()] = {
+                    "cpu_weight": 100,
+                    "tasks_max": 50,
+                    "memory_high": "1G",
+                    "memory_max": "1.2G"
+                }
+
     # 2. Package Slices
     for pkg_id, pkg_data in profiles.items():
         slice_id = f"package-{pkg_id}"
@@ -93,13 +114,20 @@ def main():
                 dom_name = item.get("domain")
                 sanitized_name = dom_name.replace(".", "-").replace("_", "-")
                 slice_name = f"domain-{sanitized_name}"
-                # Default assign to package-business slice
-                create_slice_file(slice_name, parent_slice="package-business", properties={
-                    "MemoryHigh": "1.8G",
-                    "MemoryMax": "2G",
-                    "CPUQuota": "200%",
-                    "TasksMax": 50
-                }, dry_run=args.dry_run)
+                
+                # Dynamic Package Assignment
+                assigned_pkg = domain_pkg_map.get(dom_name)
+                parent_slice = f"package-{assigned_pkg.lower()}" if assigned_pkg else "package-business"
+                
+                # Fetch properties from profile
+                pkg_data = profiles.get(assigned_pkg.lower() if assigned_pkg else "business", {})
+                props = {
+                    "MemoryHigh": pkg_data.get("memory_high", "1.8G"),
+                    "MemoryMax": pkg_data.get("memory_max", "2G"),
+                    "TasksMax": pkg_data.get("tasks_max", 50)
+                }
+                
+                create_slice_file(slice_name, parent_slice=parent_slice, properties=props, dry_run=args.dry_run)
 
     print("\n[+] Slice generation completed.")
     if not args.dry_run:

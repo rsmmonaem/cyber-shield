@@ -108,6 +108,16 @@ def scan_domain_slices() -> dict:
 
     return domain_stats
 
+def sync_cyberpanel_packages():
+    """Runs the slice generator to sync CyberPanel native packages and domains"""
+    try:
+        base_dir = Path(__file__).parent.parent
+        script = base_dir / "cgroups" / "slice_generator.py"
+        subprocess.run(["python3", str(script)], capture_output=True, check=True)
+        subprocess.run(["systemctl", "daemon-reload"], capture_output=True, check=False)
+    except Exception as e:
+        logging.error(f"Failed to sync CyberPanel packages: {e}")
+
 def evaluate_policy(domain_stats: dict, mode: str = "observe"):
     """Evaluates automatic protection policy according to Phase 20 rules"""
     for dom, stat in domain_stats.items():
@@ -143,6 +153,10 @@ def main():
         # 2. Domain Slice Scan
         stats = scan_domain_slices()
         evaluate_policy(stats, mode=args.mode)
+        
+        # 3. Native Package Sync (Every 60s)
+        if int(time.time()) % 60 < args.interval:
+            sync_cyberpanel_packages()
 
         if args.once:
             break
