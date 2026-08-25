@@ -61,12 +61,30 @@ def get_all_packages() -> dict:
         if not pkg_name:
             continue
             
+        # Parse limits and handle 0 as 'unlimited'
+        mem_limit = int(row.get('memoryLimitMB', '1024'))
+        if mem_limit == 0:
+            memory_high = "infinity"
+            memory_max = "infinity"
+        else:
+            memory_high = f"{mem_limit}M"
+            memory_max = f"{mem_limit + 256}M"
+            
+        cpu_cores = int(row.get("cpuCores", "1"))
+        cpu_weight = 100 if cpu_cores == 0 else cpu_cores * 100
+        
+        proc_limit = int(row.get("procHardLimit", "500"))
+        tasks_max = "infinity" if proc_limit == 0 else proc_limit
+        
+        io_limit = int(row.get("ioLimitMBPS", "10"))
+        io_limit_mbps = "infinity" if io_limit == 0 else io_limit
+
         packages[pkg_name.lower()] = {
-            "memory_high": f"{row.get('memoryLimitMB', '1024')}M",
-            "memory_max": f"{int(row.get('memoryLimitMB', '1024')) + 256}M",
-            "cpu_weight": int(row.get("cpuCores", "1")) * 100,
-            "tasks_max": int(row.get("procHardLimit", "500")),
-            "io_limit_mbps": int(row.get("ioLimitMBPS", "10"))
+            "memory_high": memory_high,
+            "memory_max": memory_max,
+            "cpu_weight": cpu_weight,
+            "tasks_max": tasks_max,
+            "io_limit_mbps": io_limit_mbps
         }
     return packages
 
