@@ -129,7 +129,7 @@ echo -e "${GREEN}===============================================================
 echo -e ""
 echo -e "The Domain Isolation Platform is now running in ENFORCE mode."
 echo -e ""
-echo -e "Dashboard URL : http://$SERVER_IP:8088"
+echo -e "Dashboard URL : http://$SERVER_IP:8188"
 echo -e "Installation  : $INSTALL_DIR"
 echo -e "Rollback CMD  : $INSTALL_DIR/safety/rollback.sh"
 echo -e ""

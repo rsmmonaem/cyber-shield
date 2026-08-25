@@ -13,7 +13,7 @@ import json
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 
-PORT = 8088
+PORT = 8188
 STATIC_DIR = Path(__file__).parent / "static"
 
 class DashboardHandler(SimpleHTTPRequestHandler):
