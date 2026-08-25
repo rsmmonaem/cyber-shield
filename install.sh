@@ -30,8 +30,8 @@ else
 fi
 
 # 3. Define installation directory
-INSTALL_DIR="/root/domain-isolation-platform"
-REPO_URL="https://github.com/rsmmonaem/domain-isolation-platform.git" # Replace with actual repo URL when published
+INSTALL_DIR="/root/cyber-shield"
+REPO_URL="https://github.com/rsmmonaem/cyber-shield.git"
 
 echo -e "${GREEN}[+] Setting up installation directory at $INSTALL_DIR...${NC}"
 
