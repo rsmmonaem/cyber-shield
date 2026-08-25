@@ -18,6 +18,14 @@ STATIC_DIR = Path(__file__).parent / "static"
 
 class DashboardHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
+        if self.path == "/" or self.path == "/index.html":
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html")
+            self.end_headers()
+            with open(STATIC_DIR / "index.html", "rb") as f:
+                self.wfile.write(f.read())
+            return
+
         if self.path == "/api/metrics":
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
